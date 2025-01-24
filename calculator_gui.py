@@ -18,7 +18,6 @@ class Calculator(Frame):
         # StringVar to hold the display value
         self.display = StringVar()
         self.display.set("")  # Initialize display
-        self.current_mode = "Light Mode"
 
         # Entry widget for display
         self.display_entry = Entry(self, relief=RIDGE, textvariable=self.display,
@@ -73,42 +72,36 @@ class Calculator(Frame):
         elif char == "=":
             try:
                 # Evaluate the current expression
-                result = eval(self.display.get())
+                result = self.evaluate_expression(self.display.get())
                 self.display.set(result)
             except:
                 self.display.set("ERROR")
         elif char == "√":
-            try:
-                # Handle square root; evaluate the display if a number exists, otherwise assume 0
-                value = float(self.display.get()) if self.display.get() else 0
-                self.display.set(math.sqrt(value))
-            except:
-                self.display.set("ERROR")
+            # Insert the square root function
+            self.display.set(self.display.get() + "sqrt(")
         elif char in ["sin", "cos", "tan"]:
-            try:
-                # Handle trigonometric functions; assume radians
-                value = float(self.display.get()) if self.display.get() else 0
-                if char == "sin":
-                    self.display.set(math.sin(math.radians(value)))
-                elif char == "cos":
-                    self.display.set(math.cos(math.radians(value)))
-                elif char == "tan":
-                    self.display.set(math.tan(math.radians(value)))
-            except:
-                self.display.set("ERROR")
+            # Insert trigonometric function
+            self.display.set(self.display.get() + f"{char}(")
         elif char == "^":
-            # Power (e.g., 2^3 = 2**3)
+            # Insert power operator
             self.display.set(self.display.get() + "**")
         elif char == "%":
-            try:
-                # Percentage
-                value = float(self.display.get())
-                self.display.set(value / 100)
-            except:
-                self.display.set("ERROR")
+            # Append percentage symbol
+            self.display.set(self.display.get() + "/100")
         else:
             # Append the character to the display
             self.display.set(self.display.get() + char)
+
+    def evaluate_expression(self, expression):
+        """Evaluate the given expression with support for math functions."""
+        # Replace function names with Python's math module functions
+        expression = expression.replace("sqrt", "math.sqrt")
+        expression = expression.replace("sin", "math.sin")
+        expression = expression.replace("cos", "math.cos")
+        expression = expression.replace("tan", "math.tan")
+
+        # Evaluate the expression
+        return eval(expression)
 
 
 if __name__ == '__main__':
